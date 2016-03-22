@@ -3,6 +3,7 @@
 # Created on 3.1.6.2016 by kbowerma
 # build with:  docker build  --rm=true -t spooner .
 # run with:  docker run -it --name run_spoon spooner /bin/bash
+#
 # 0. docker build --rm=true -t spooner .
 #
 # 1. The command to run this cotainer attached
@@ -39,8 +40,9 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   RUN  cd /home/informix/myexport && sh /home/informix/myexport/myexport.shar
   RUN chown -R informix:informix  /home/informix/myexport
   RUN chmod -R a+x /home/informix/myexport
-  RUN cp /home/informix/myexport/* /opt/IBM/informix/bin
-    RUN ls -ltr /home/informix/myexport
+  RUN mv /home/informix/myexport/* /opt/IBM/informix/bin
+  RUN rmdir /home/informix/myexport
+
 
 #Now get myschema
   RUN mkdir /home/informix/utils2
@@ -51,6 +53,8 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   RUN  echo n | sh utils2_ak
   RUN ar -x myschema.source.ar
 
+#Make Infomix a sudoer (not needed for secton below be used for later installation )
+RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 # start and Run informix
   # set environment variables

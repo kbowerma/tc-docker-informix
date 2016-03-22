@@ -70,5 +70,6 @@ RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
   ENV PATH $INFORMIXDIR/bin:$JAVA_HOME/bin:$PATH:$HOME/bin:$ANT_HOME/bin
   WORKDIR /home/informix
   USER informix
+
   # start informix, and KEEP PROCESS RUNNING
   CMD oninit -y && bash

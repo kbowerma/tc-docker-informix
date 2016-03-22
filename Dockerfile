@@ -54,7 +54,10 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   RUN ar -x myschema.source.ar
 
 #Make Infomix a sudoer (not needed for secton below be used for later installation )
-RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+ RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+
+
 
 # start and Run informix
   # set environment variables
@@ -70,6 +73,10 @@ RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
   ENV PATH $INFORMIXDIR/bin:$JAVA_HOME/bin:$PATH:$HOME/bin:$ANT_HOME/bin
   WORKDIR /home/informix
   USER informix
+
+  #TestDataTool
+   COPY TestDataTool.zip /home/informix/TestDataTool.zip
+   RUN unzip TestDataTool.zip
 
   # start informix, and KEEP PROCESS RUNNING
   CMD oninit -y && bash

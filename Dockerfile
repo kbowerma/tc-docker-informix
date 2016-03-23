@@ -6,9 +6,9 @@
 #
 # 0. docker build --rm=true -t spooner .
 #
-# 1. The command to run this cotainer attached
+# 1. The command to run this cotainer attached, and remove it when exited
 #
-#     docker run -it --name run_spoon spooner
+#     docker run -it --rm --name run_spoon spooner
 #
 # 2. The command to run this container detached.
 #
@@ -68,15 +68,25 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   ENV INFORMIXSERVER informixoltp_tcp
   ENV ONCONFIG onconfig.informixoltp_tcp
   ENV INFORMIXSQLHOSTS "/opt/IBM/informix/etc/sqlhosts.informixoltp_tcp"
-  ENV JAVA_HOME /usr/share/java
+  #ENV JAVA_HOME /usr/share/java
+  ENV JAVA_HOME /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.91-2.6.2.1.el7_1.x86_64
   ENV ANT_HOME /usr/share/ant
   ENV PATH $INFORMIXDIR/bin:$JAVA_HOME/bin:$PATH:$HOME/bin:$ANT_HOME/bin
   WORKDIR /home/informix
-  USER informix
+  #USER informix
 
   #TestDataTool
-   COPY TestDataTool.zip /home/informix/TestDataTool.zip
-   RUN unzip TestDataTool.zip
+   COPY TestDataToolSrc /home/informix/TestDataToolSrc
+   RUN chown -R informix:informix  /home/informix/TestDataToolSrc
+   USER informix
+   WORKDIR  /home/informix/TestDataToolSrc/build/ant/classes
+   RUN jar -cvf /home/informix/TestDataToolSrc/testDataTool.jar .
+   WORKDIR  /home/informix/TestDataToolSrc
 
   # start informix, and KEEP PROCESS RUNNING
   CMD oninit -y && bash
+
+    #  Now create and connect to the container,  Note this will remove the container once you exit.   See above to run detached
+    #  docker run -it --rm --name run_spoon spooner
+    #  run the script to create the sql load files:   ant run
+    #  execute the load tool to insert the data:  ant bulk-test-data-load

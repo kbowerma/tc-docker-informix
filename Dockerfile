@@ -82,6 +82,7 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
    WORKDIR  /home/informix/TestDataToolSrc/build/ant/classes
    RUN jar -cvf /home/informix/TestDataToolSrc/testDataTool.jar .
    WORKDIR  /home/informix/TestDataToolSrc
+   RUN mkdir output
 
   # start informix, and KEEP PROCESS RUNNING
   CMD oninit -y && bash

@@ -42,6 +42,8 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   RUN chmod -R a+x /home/informix/myexport
   RUN mv /home/informix/myexport/* /opt/IBM/informix/bin
   RUN rmdir /home/informix/myexport
+  # Removing line 395d based on http://www.iiug.org/forums/ids/index.cgi/read/36071
+  RUN sed -ie '395d' /opt/IBM/informix/bin/myexport
 
 
 #Now get myschema
@@ -51,7 +53,11 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   RUN gunzip utils2_ak.gz
    RUN ls -ltr
   RUN  echo n | sh utils2_ak
+  RUN chown -R informix:informix  /home/informix/utils2
+  RUN chmod -R a+x /home/informix/utils2
   RUN ar -x myschema.source.ar
+  #submission
+
 
 #Make Infomix a sudoer (not needed for secton below be used for later installation )
  RUN echo 'informix ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
@@ -64,7 +70,7 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   ENV DB_LOCALE EN_US.UTF8
   ENV CLIENT_LOCALE EN_US.UTF8
   ENV INFORMIXDIR /opt/IBM/informix
-  ENV LD_LIBRARY_PATH $INFORMIXDIR/lib:/lib64:/usr/lib64:$LD_LIBRARY_PATH
+  ENV LD_LIBRARY_PATH $INFORMIXDIR/lib:/lib64:/usr/lib64:$INFORMIXDIR/lib/esql:$INFORMIXDIR/lib/tools:$LD_LIBRARY_PATH
   ENV INFORMIXSERVER informixoltp_tcp
   ENV ONCONFIG onconfig.informixoltp_tcp
   ENV INFORMIXSQLHOSTS "/opt/IBM/informix/etc/sqlhosts.informixoltp_tcp"
@@ -78,13 +84,24 @@ MAINTAINER Kyle Bowerman "kyle.bowerman@topcoder.com"
   #TestDataTool
    COPY TestDataToolSrc /home/informix/TestDataToolSrc
    RUN chown -R informix:informix  /home/informix/TestDataToolSrc
+
    USER informix
    WORKDIR  /home/informix/TestDataToolSrc/build/ant/classes
    RUN jar -cvf /home/informix/TestDataToolSrc/testDataTool.jar .
-   WORKDIR  /home/informix/TestDataToolSrc
-   RUN mkdir output
+   #RUN mkdir  /home/informix/TestDataToolSrc/output
+
+   # finish building mychema need to do this as informix
+   #RUN cd /home/informix/utils2 && make -f myschema.mk.norcs
+   WORKDIR  /home/informix/utils2
+   RUN ls -l
+   RUN make -f myschema.mk.norcs
+   RUN mv myschema /opt/IBM/informix/bin/
+   #RUN rm -rf /home/informix/utils2
+
+
 
   # start informix, and KEEP PROCESS RUNNING
+  WORKDIR /home/informix
   CMD oninit -y && bash
 
     #  Now create and connect to the container,  Note this will remove the container once you exit.   See above to run detached

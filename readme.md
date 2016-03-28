@@ -18,7 +18,7 @@ This project will setup a docker image and container for Topcoders Informix envi
 
     ```docker run -it --rm --name run_spoon spooner```
 
-5.  generate sample records
+5.  cd TestDataToolSrc & generate sample records
 
      ```ant run```
 
